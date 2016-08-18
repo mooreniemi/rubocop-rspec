@@ -20,13 +20,24 @@ describe RuboCop::Cop::RSpec::CapybaraOrdering do
     RUBY
   end
 
-  xit 'auto-corrects ordering if line swap is enough' do
+  it 'auto-corrects ordering if line swap is enough' do
     corrected =
       autocorrect_source(
         cop,
-        ['it { expect(0).to_not equal 1 }'],
+        [<<-RUBY
+        it '...' do
+          expect(Model.last.name).to eq('model name')
+          expect(page).to have_text('model name')
+        end
+        RUBY
+        ],
         'spec/foo_spec.rb'
     )
-    expect(corrected).to eq 'it { expect(0).not_to equal 1 }'
+    expect(corrected).to eq(<<-RUBY)
+        it '...' do
+          expect(page).to have_text('model name')
+          expect(Model.last.name).to eq('model name')
+        end
+    RUBY
   end
 end

@@ -6,7 +6,7 @@ module RuboCop
     module RSpec
       # When using acceptance testing with Capybara, using
       # non-Capybara matchers before Capybara matchers will
-      # introduce intermittent errors and should be avoided.
+      # introduce intermittent failures and should be avoided.
       #
       # @example
       #   # bad
@@ -15,10 +15,15 @@ module RuboCop
       #     expect(page).to have_text('model name')
       #   end
       #
-      #   # good
+      #   # better
       #   it '...' do
       #     expect(page).to have_text('model name')
       #     expect(Model.last.name).to eq('model name')
+      #   end
+      #
+      #   # best
+      #   it '...' do
+      #     expect(page).to have_text('model name')
       #   end
       class CapybaraOrdering < Cop
         include RuboCop::RSpec::SpecOnly,
@@ -38,7 +43,7 @@ module RuboCop
 
         def_node_search :matcher, <<-PATTERN
           (send _ {
-          #{ALL_MATCHERS.to_s.delete('[]').gsub(',',"\n")}
+        #{ALL_MATCHERS.to_s.delete('[]').gsub(',',"\n")}
           }
          ...)
         PATTERN
@@ -55,10 +60,17 @@ module RuboCop
         end
 
         def autocorrect(node)
-          _receiver, method_name, *_args = *node
+          matchers = matcher(node.parent.parent)
+
+          one = matchers.next
+          two = matchers.next
+
           lambda do |corrector|
-            corrector.replace(node.loc.selector,
-                              method_name.equal?(:not_to) ? 'to_not' : 'not_to')
+            #require'pry';binding.pry
+            safe = two.parent
+            unsafe = one.parent
+            corrector.replace(unsafe.loc.expression, safe.source)
+            corrector.replace(safe.loc.expression, unsafe.source)
           end
         end
       end
