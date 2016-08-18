@@ -50,6 +50,7 @@ module RuboCop
 
         def on_block(node)
           return unless example?(node) && (matchers = matcher(node))
+          return if matchers.to_a.size <= 1
 
           one = matchers.next
           two = matchers.next

@@ -22,7 +22,6 @@ module ExpectViolation
 
   def expect_no_violations(source, filename: DEFAULT_FILENAME)
     inspect_source(cop, source, filename)
-
     expect(cop.offenses.empty?).to be(true)
   end
 
