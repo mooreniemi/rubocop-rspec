@@ -125,3 +125,7 @@ RSpec/NamedSubject:
 RSpec/SubjectStub:
   Description: 'Checks for stubbed test subjects'
   Enabled: true
+
+RSpec/CapybaraOrdering:
+  Description: 'Prevent threading issues in your acceptance tests.'
+  Enabled: true

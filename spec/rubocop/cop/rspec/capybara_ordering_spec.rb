@@ -1,0 +1,32 @@
+describe RuboCop::Cop::RSpec::CapybaraOrdering do
+  subject(:cop) { described_class.new }
+
+  it 'detects offense when matchers sequenced unsafely' do
+    expect_violation(<<-RUBY)
+        it '...' do
+          expect(Model.last.name).to eq('model name')
+                                     ^^^^^^^^^^^^^^^^ You should probably swap the line sequence of `eq` and `have_text`.
+          expect(page).to have_text('model name')
+        end
+    RUBY
+  end
+
+  it 'detects no offense when matchers sequenced safely' do
+    expect_no_violations(<<-RUBY)
+        it '...' do
+          expect(page).to have_text('model name')
+          expect(Model.last.name).to eq('model name')
+        end
+    RUBY
+  end
+
+  xit 'auto-corrects ordering if line swap is enough' do
+    corrected =
+      autocorrect_source(
+        cop,
+        ['it { expect(0).to_not equal 1 }'],
+        'spec/foo_spec.rb'
+    )
+    expect(corrected).to eq 'it { expect(0).not_to equal 1 }'
+  end
+end
