@@ -24,7 +24,7 @@ module RuboCop
         include RuboCop::RSpec::SpecOnly,
           RuboCop::RSpec::Language
 
-        MSG = 'You should probably swap the line sequence of `%{one}` and `%{two}`.'.freeze
+        MSG = 'To maintain Capybara concurrency protection, swap the line sequence of `%{one}` and `%{two}`.'.freeze
 
         SAFE_MATCHERS = Capybara::RSpecMatchers.instance_methods(false).freeze
         # expect is used by both so we don't care
@@ -49,7 +49,6 @@ module RuboCop
           one = matchers.next
           two = matchers.next
 
-          #require'pry';binding.pry
           if UNSAFE_MATCHERS.include?(one.method_name) && SAFE_MATCHERS.include?(two.method_name)
             add_offense(one, :expression, MSG % { one: one.method_name, two: two.method_name} )
           end

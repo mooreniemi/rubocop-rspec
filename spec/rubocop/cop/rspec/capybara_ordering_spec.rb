@@ -5,7 +5,7 @@ describe RuboCop::Cop::RSpec::CapybaraOrdering do
     expect_violation(<<-RUBY)
         it '...' do
           expect(Model.last.name).to eq('model name')
-                                     ^^^^^^^^^^^^^^^^ You should probably swap the line sequence of `eq` and `have_text`.
+                                     ^^^^^^^^^^^^^^^^ To maintain Capybara concurrency protection, swap the line sequence of `eq` and `have_text`.
           expect(page).to have_text('model name')
         end
     RUBY
