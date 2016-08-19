@@ -32,9 +32,14 @@ module RuboCop
         MSG = 'To maintain Capybara concurrency protection,' \
           ' swap the line sequence of `%{one}` and `%{two}`.'.freeze
 
-        SAFE_MATCHERS = Capybara::RSpecMatchers.instance_methods(false).freeze
+        # capybara and rspec intersect on some methods, leading to
+        # ambiguous cases. right now we're just handling `within` but
+        # moving to an explicit whitelist or a configurable one might
+        # be necessary to really parse a full codebase
+        SAFE_MATCHERS = Capybara::RSpecMatchers.instance_methods(false).
+          push(:within).freeze
         UNSAFE_MATCHERS = ::RSpec::Matchers.instance_methods(false).
-          tap {|h| h.delete(:expect) }.freeze
+          tap {|h| h.delete(:expect) }.tap {|h| h.delete(:within) }.freeze
         ALL_MATCHERS = SAFE_MATCHERS + UNSAFE_MATCHERS
 
         def_node_matcher :example?, <<-PATTERN

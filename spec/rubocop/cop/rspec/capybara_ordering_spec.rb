@@ -1,5 +1,10 @@
 describe RuboCop::Cop::RSpec::CapybaraOrdering do
   subject(:cop) { described_class.new }
+  it 'makes use of SAFE_MATCHERS and UNSAFE_MATCHERS' do
+    safe = RuboCop::Cop::RSpec::CapybaraOrdering::SAFE_MATCHERS
+    unsafe = RuboCop::Cop::RSpec::CapybaraOrdering::UNSAFE_MATCHERS
+    expect(unsafe & safe).to eq([])
+  end
 
   it 'detects offense when matchers sequenced unsafely' do
     expect_violation(<<-RUBY)
